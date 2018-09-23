@@ -57,20 +57,6 @@ def download_page(url):
     return data
 
 
-def get_brief(item):
-    hyperlink = item.find('div',attrs={'class':'pic'}).find('a')['href']
-    hyperlink_page = download_page(hyperlink)
-    content = BeautifulSoup(hyperlink_page, 'html.parser')
-    brief_para = str(content.find('div',attrs={'id':'link-report'}).find('span',attrs={'class':''}).get_text())
-    # if (brief_para.find('<br />')) <0:
-    #
-    #     print 'yes！'
-    #     b = brief_para
-    # else:
-    b = brief_para.split('<br/>')[0]
-    return b.strip()[0:100]
-
-
 def get_li(doc):
     #待补充爬取图片
     #referer UA随机待验证
