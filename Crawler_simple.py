@@ -84,12 +84,8 @@ def get_li(doc):
     info_list = []  # 短评
     area_list = []  # 地区
     tags_list = []  # 标签
-    brief_list = [] # 简介
 
     for i in ol.find_all('li'):
-        # # # #       #       #            #       #        #
-        brief = get_brief(i)
-        # print brief
 
         detail = i.find('div', attrs={'class': 'hd'})
         movie_name = detail.find(
@@ -115,13 +111,12 @@ def get_li(doc):
             info_list.append('无')
         area_list.append(area)
         tags_list.append(tags)
-        brief_list.append(brief)
         star_con.append(star_num)
 
     page = soup.find('span', attrs={'class': 'next'}).find('a')  # 获取下一页
     if page:
-        return name, star_con, score, info_list, area_list,tags_list,brief_list, DOWNLOAD_URL + page['href']
-    return name, star_con, score, info_list, area_list, tags_list, brief_list, None
+        return name, star_con, score, info_list, area_list,tags_list,DOWNLOAD_URL + page['href']
+    return name, star_con, score, info_list, area_list, tags_list,  None
 
 def connectDb():
     db = MySQLdb.connect("localhost", "root", "", "PythonTest", charset='utf8')
@@ -154,18 +149,16 @@ def main():
     info = []
     moviearea = []
     movietags = []
-    moviebrief = []
 
     while url:
         doc = download_page(url)
-        movie, star, level_num, info_list, area, tags, brief, url = get_li(doc)
+        movie, star, level_num, info_list, area, tags, url = get_li(doc)
         name = name + movie
         star_con = star_con + star
         score = score + level_num
         info = info + info_list
         moviearea = moviearea + area
         movietags = movietags + tags
-        moviebrief = moviebrief + brief
         # time.sleep(random.uniform(5,20))
 
     dataSrc = connectDb()
@@ -176,7 +169,6 @@ def main():
         content3 = info[i]
         content4 = moviearea[i]
         content5 = movietags[i]
-        content6 = moviebrief[i]
 
         cursor = dataSrc.cursor()
         # 使用execute方法执行SQL语句
@@ -185,11 +177,10 @@ def main():
 
         content4 = unicode(content4)
         content5 = unicode(content5)
-        content6 = unicode(content6)
 
-        intosql = "INSERT INTO movietmp(moviename,score, comment,area,tags,brief)VALUES ('%s',%.1f,'%s','%s','%s','%s')" \
+        intosql = "INSERT INTO movies(moviename,score, comment,area,tags)VALUES ('%s',%.1f,'%s','%s','%s')" \
                   % (MySQLdb.escape_string(content1),content2,MySQLdb.escape_string(content3),\
-                     MySQLdb.escape_string(content4),MySQLdb.escape_string(content5),MySQLdb.escape_string(content6))
+                     MySQLdb.escape_string(content4),MySQLdb.escape_string(content5))
         intoTable(dataSrc,intosql)
 
     dataSrc.close()
